@@ -32,6 +32,8 @@
         uname(&systemInfo);
         NSString *deviceOriginalStr = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
         NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+        NSString *bundlePath = [bundle pathForResource:@"BasicTools" ofType:@"bundle"];
+        bundle = [NSBundle bundleWithPath:bundlePath];
         NSString *filePath = [bundle pathForResource:@"iOSDeviceTypeInfo" ofType:@"plist"];
         NSDictionary *allDeviceInfoDic = [NSDictionary dictionaryWithContentsOfFile:filePath];
         deviceType = allDeviceInfoDic[deviceOriginalStr];

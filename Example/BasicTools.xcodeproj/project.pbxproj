@@ -526,6 +526,7 @@
 			baseConfigurationReference = EF06E9D3631B5F3D2FF53556 /* Pods-BasicTools_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44P692X9PQ;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BasicTools/BasicTools-Prefix.pch";
@@ -543,6 +544,7 @@
 			baseConfigurationReference = 5284A0F4A6897705D89AB7D0 /* Pods-BasicTools_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44P692X9PQ;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BasicTools/BasicTools-Prefix.pch";

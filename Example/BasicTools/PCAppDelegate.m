@@ -7,12 +7,14 @@
 //
 
 #import "PCAppDelegate.h"
+#import <BasicTools/NetworkService.h>
 
 @implementation PCAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [[NetworkService shareInstance] startMonitor];
     return YES;
 }
 
