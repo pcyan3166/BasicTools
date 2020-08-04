@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 设备号
 + (NSString *)deviceId;
 
+/// 重新生成一个deviceId
++ (NSString *)resetDeviceId;
+
 @end
 
 NS_ASSUME_NONNULL_END

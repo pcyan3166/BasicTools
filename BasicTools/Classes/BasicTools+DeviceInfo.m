@@ -6,6 +6,10 @@
 //
 
 #import "BasicTools+DeviceInfo.h"
+#import "NetworkService.h"
+#import "BasicTools+AppInfo.h"
+#import <SAMKeychain/SAMKeychain.h>
+#import "sys/utsname.h"
 
 @implementation BasicTools (DeviceInfo)
 
@@ -14,7 +18,7 @@
 }
 
 + (NSString *)osVersion {
-    return @"";
+    return [[UIDevice currentDevice] systemVersion];
 }
 
 + (NSString *)deviceBrand {
@@ -22,15 +26,48 @@
 }
 
 + (NSString *)deviceType {
-    return @"";
+    static NSString *deviceType = nil;
+    if (deviceType == nil) {
+        struct utsname systemInfo;
+        uname(&systemInfo);
+        NSString *deviceOriginalStr = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+        NSString *filePath = [bundle pathForResource:@"iOSDeviceTypeInfo" ofType:@"plist"];
+        NSDictionary *allDeviceInfoDic = [NSDictionary dictionaryWithContentsOfFile:filePath];
+        deviceType = allDeviceInfoDic[deviceOriginalStr];
+    }
+    
+    return deviceType;
 }
 
 + (NSString *)networkType {
-    return @"";
+    return [[NetworkService shareInstance] currentStatus];
 }
 
 + (NSString *)deviceId {
-    return @"";
+    static NSString *deviceId = nil;
+    if (deviceId == nil) {
+        deviceId = [SAMKeychain passwordForService:[BasicTools appId] account:@"deviceId"];
+        if ([deviceId length] <= 0) {
+            CFUUIDRef uuidRef= CFUUIDCreate(kCFAllocatorDefault);
+            deviceId = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuidRef));
+            CFRelease(uuidRef);
+            
+            [SAMKeychain setPassword:deviceId forService:[BasicTools appId] account:@"deviceId"];
+        }
+    }
+    
+    return deviceId;
+}
+
++ (NSString *)resetDeviceId {
+    CFUUIDRef uuidRef= CFUUIDCreate(kCFAllocatorDefault);
+    NSString *deviceId = (NSString *)CFBridgingRelease(CFUUIDCreateString(kCFAllocatorDefault, uuidRef));
+    CFRelease(uuidRef);
+    
+    [SAMKeychain setPassword:deviceId forService:[BasicTools appId] account:@"deviceId"];
+    
+    return deviceId;
 }
 
 @end
