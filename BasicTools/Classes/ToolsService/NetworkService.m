@@ -48,12 +48,13 @@
             if (!self.tmInMonitor) {
                 self.tmInMonitor = YES;
                 
+                __weak typeof(self) weakSelf = self;
                 _tmReachability.reachableBlock = ^(TMReachability* reach) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
+                    [weakSelf updateCurrentStatusWithTMReachability:reach];
                 };
 
                 _tmReachability.unreachableBlock = ^(TMReachability *reach) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
+                    [weakSelf updateCurrentStatusWithTMReachability:reach];
                 };
                 
                 [_tmReachability startNotifier];
@@ -90,6 +91,8 @@
             self.networkStatus = @"未知网络";
             break;
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:weakSelf.networkStatus];
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification {
@@ -119,6 +122,8 @@
             self.networkStatus = @"未知网络";
             break;
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:self.networkStatus];
 }
 
 @end
