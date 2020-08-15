@@ -7,11 +7,14 @@
 
 #import "NetworkService.h"
 #import "TMReachability.h"
+#import "HLNetWorkReachability.h"
 
 @interface NetworkService ()
 
 @property (nonatomic, strong) TMReachability *tmReachability;
-@property (atomic, assign) BOOL inMonitor;
+@property (nonatomic, strong) HLNetWorkReachability *hlReachability;
+@property (atomic, assign) BOOL tmInMonitor;
+@property (atomic, assign) BOOL hlInMonitor;
 
 @end
 
@@ -28,40 +31,94 @@
     return sInstance;
 }
 
++ (instancetype)micromeshShareInstance {
+    static NetworkService *sInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sInstance = [[NetworkService alloc] init];
+        sInstance.hlReachability = [HLNetWorkReachability reachabilityWithHostName:@"https://www.baidu.com"];
+    });
+    
+    return sInstance;
+}
+
 - (void)startMonitor {
     @synchronized (self.tmReachability) {
-        if (!self.inMonitor) {
-            self.inMonitor = YES;
-            
-            _tmReachability.reachableBlock = ^(TMReachability* reach) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
-            };
+        if (self.tmReachability != nil) {
+            if (!self.tmInMonitor) {
+                self.tmInMonitor = YES;
+                
+                _tmReachability.reachableBlock = ^(TMReachability* reach) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
+                };
 
-            _tmReachability.unreachableBlock = ^(TMReachability *reach) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
-            };
-            
-            [_tmReachability startNotifier];
+                _tmReachability.unreachableBlock = ^(TMReachability *reach) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:reach];
+                };
+                
+                [_tmReachability startNotifier];
+            }
+        }
+    }
+    
+    @synchronized (self.hlReachability) {
+        if (self.hlReachability != nil) {
+            if (!self.hlInMonitor) {
+                self.hlInMonitor = YES;
+                
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(reachabilityChanged:)
+                                                             name:kNetWorkReachabilityChangedNotification object:nil];
+                [_hlReachability startNotifier];
+            }
         }
     }
 }
 
-- (NSString *)currentStatus {
-    switch (self.tmReachability.currentReachabilityStatus) {
+- (void)updateCurrentStatusWithTMReachability:(TMReachability *)reach {
+    switch (reach.currentReachabilityStatus) {
         case NotReachable:
-            return @"无网络";
+            self.networkStatus = @"无网络";
             break;
         case ReachableViaWiFi:
-            return @"WIFI";
+            self.networkStatus = @"WIFI";
             break;
         case ReachableViaWWAN:
-            return @"移动网络";
+            self.networkStatus = @"移动网络";
             break;
         default:
+            self.networkStatus = @"未知网络";
             break;
     }
+}
+
+- (void)reachabilityChanged:(NSNotification *)notification {
+    HLNetWorkReachability *curReach = [notification object];
+    HLNetWorkStatus netStatus = [curReach currentReachabilityStatus];
     
-    return @"未知网络状态";
+    switch (netStatus) {
+        case HLNetWorkStatusNotReachable:
+            self.networkStatus = @"无网络";
+            break;
+        case HLNetWorkStatusUnknown:
+            self.networkStatus = @"未知网络";
+            break;
+        case HLNetWorkStatusWWAN2G:
+            self.networkStatus = @"2G";
+            break;
+        case HLNetWorkStatusWWAN3G:
+            self.networkStatus = @"3G";
+            break;
+        case HLNetWorkStatusWWAN4G:
+            self.networkStatus = @"4G";
+            break;
+        case HLNetWorkStatusWiFi:
+            self.networkStatus = @"WIFI";
+            break;
+        default:
+            self.networkStatus = @"未知网络";
+            break;
+    }
 }
 
 @end

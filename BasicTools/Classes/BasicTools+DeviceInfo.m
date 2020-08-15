@@ -43,7 +43,7 @@
 }
 
 + (NSString *)networkType {
-    return [[NetworkService shareInstance] currentStatus];
+    return [NetworkService shareInstance].networkStatus;
 }
 
 + (NSString *)deviceId {
