@@ -92,7 +92,7 @@
             break;
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:weakSelf.networkStatus];
+    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:self.networkStatus];
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification {
