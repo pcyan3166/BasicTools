@@ -79,20 +79,20 @@
 - (void)updateCurrentStatusWithTMReachability:(TMReachability *)reach {
     switch (reach.currentReachabilityStatus) {
         case NotReachable:
-            self.networkStatus = @"无网络";
+            self.networkStatus = eNetworkStatusNotReachable;
             break;
         case ReachableViaWiFi:
-            self.networkStatus = @"WIFI";
+            self.networkStatus = eNetworkStatusWifi;
             break;
         case ReachableViaWWAN:
-            self.networkStatus = @"移动网络";
+            self.networkStatus = eNetworkStatusMobileNetwork;
             break;
         default:
-            self.networkStatus = @"未知网络";
+            self.networkStatus = eNetworkStatusUnkown;
             break;
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:self.networkStatus];
+    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:@(self.networkStatus)];
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification {
@@ -101,29 +101,51 @@
     
     switch (netStatus) {
         case HLNetWorkStatusNotReachable:
-            self.networkStatus = @"无网络";
+            self.networkStatus = eNetworkStatusNotReachable;
             break;
         case HLNetWorkStatusUnknown:
-            self.networkStatus = @"未知网络";
+            self.networkStatus = eNetworkStatusUnkown;
             break;
         case HLNetWorkStatusWWAN2G:
-            self.networkStatus = @"2G";
+            self.networkStatus = eNetworkStatus2G;
             break;
         case HLNetWorkStatusWWAN3G:
-            self.networkStatus = @"3G";
+            self.networkStatus = eNetworkStatus3G;
             break;
         case HLNetWorkStatusWWAN4G:
-            self.networkStatus = @"4G";
+            self.networkStatus = eNetworkStatus4G;
             break;
         case HLNetWorkStatusWiFi:
-            self.networkStatus = @"WIFI";
+            self.networkStatus = eNetworkStatusWifi;
             break;
         default:
-            self.networkStatus = @"未知网络";
+            self.networkStatus = eNetworkStatusUnkown;
             break;
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:self.networkStatus];
+    [[NSNotificationCenter defaultCenter] postNotificationName:BTNetworkStatusChangedNotification object:@(self.networkStatus)];
+}
+
++ (NSString *)descriptionForNetworkStatus:(ENetworkStatus)networkStatus {
+    switch (networkStatus) {
+        case eNetworkStatusNotReachable:
+            return @"无网络";
+        case eNetworkStatusUnkown:
+            return @"未知网络";
+        case eNetworkStatus2G:
+            return @"2G";
+            break;
+        case eNetworkStatus3G:
+            return @"3G";
+            break;
+        case eNetworkStatus4G:
+            return @"4G";
+        case eNetworkStatusWifi:
+            return @"WIFI";
+        default:
+            return @"未知网络";
+            break;
+    }
 }
 
 @end
